@@ -1,0 +1,97 @@
+﻿{
+   "CodeGenerationMode": 4,
+   "ContextClassName": "isgportalContext",
+   "ContextNamespace": null,
+   "FilterSchemas": false,
+   "IncludeConnectionString": true,
+   "ModelNamespace": null,
+   "OutputContextPath": null,
+   "OutputPath": "Models",
+   "PreserveCasingWithRegex": true,
+   "ProjectRootNamespace": "guveporrtapi",
+   "Schemas": null,
+   "SelectedHandlebarsLanguage": 2,
+   "SelectedToBeGenerated": 0,
+   "T4TemplatePath": null,
+   "Tables": [
+      {
+         "Name": "public.accident",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.accident_report_staff",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.contract",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.contract_accident",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.contract_and_job",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.doctor",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.employee",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.medical_examination",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.office",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.staff",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.staff_office",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.staff_workplace",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.workplace",
+         "ObjectType": 0
+      }
+   ],
+   "UiHint": null,
+   "UncountableWords": null,
+   "UseAsyncStoredProcedureCalls": true,
+   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseDatabaseNames": false,
+   "UseDatabaseNamesForRoutines": true,
+   "UseDateOnlyTimeOnly": true,
+   "UseDbContextSplitting": false,
+   "UseDecimalDataAnnotationForSprocResult": true,
+   "UseFluentApiOnly": true,
+   "UseHandleBars": false,
+   "UseHierarchyId": false,
+   "UseInflector": true,
+   "UseInternalAccessModifiersForSprocsAndFunctions": false,
+   "UseLegacyPluralizer": false,
+   "UseManyToManyEntity": true,
+   "UseNoDefaultConstructor": false,
+   "UseNoNavigations": false,
+   "UseNoObjectFilter": true,
+   "UseNodaTime": false,
+   "UseNullableReferences": false,
+   "UsePrefixNavigationNaming": false,
+   "UseSchemaFolders": false,
+   "UseSchemaNamespaces": false,
+   "UseSpatial": false,
+   "UseT4": false,
+   "UseT4Split": false
+}
