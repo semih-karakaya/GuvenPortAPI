@@ -9,7 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace guveporrtapi.Models
+namespace GuvenPortAPI.Models
 {
     public static class DbContextExtensions
     {

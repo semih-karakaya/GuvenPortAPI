@@ -1,0 +1,168 @@
+﻿using GuvenPortAPI.Models; // Use the correct namespace for your models
+using GuvenPortAPI.Models.Interface; // Use the correct namespace for your models
+using System;
+using System.Text;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
+using System.Net.Http;
+using System.Security.Cryptography.X509Certificates;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using System.Linq;
+using Newtonsoft.Json; // Keep if you use JsonConvert
+
+// You might need a specific interface for this service (e.g., IOfficeService)
+// namespace demo.webapi.Models.Interface
+// {
+//     public interface IOfficeService
+//     {
+//         Task<Office> AddOfficeService(Office office);
+//         Task<List<vmOfficeDetails>> ListOfficeService(); // You'll need a VM for listing offices
+//         Task<vmOfficeDetails> GetOneOfficeFromID(int id); // You'll need a VM for getting details
+//         Task<Office> EditOfficeService(Office office);
+//         Task<bool> DeleteOfficeService(int id);
+//         // Add methods for managing related entities like StaffOffice and Workplaces if needed
+//     }
+// }
+
+
+namespace GuvenPortAPI.Service
+{
+    // You'll need to implement an interface like IOfficeService
+    public class OfficeService : IOfficeService
+    {
+        private readonly isgportalContext _db;
+
+        public OfficeService(isgportalContext db)
+        {
+            _db = db;
+        }
+
+        public async Task<Office> AddOfficeService(Office office)
+        {
+            if (office != null)
+            {
+                _db.Offices.Add(office);
+                await _db.SaveChangesAsync();
+                return office;
+            }
+            else
+            {
+                return new Office(); // Avoid returning null
+            }
+        }
+
+        public async Task<List<vmOfficeDetails>> ListOfficeService()
+        {
+            List<vmOfficeDetails> officeList = new List<vmOfficeDetails>();
+
+            var offices = await _db.Offices
+                                 .Include(o => o.IdManagerstaffNavigation)
+                                 .Where(o => o.Active != false)
+                                 .ToListAsync();
+
+            foreach (var office in offices)
+            {
+                vmOfficeDetails officeDetails = new vmOfficeDetails
+                {
+                    Id = office.Id,
+                    OfficeName = office.OName ?? string.Empty,
+                    Address = office.Address ?? string.Empty,
+                    ManagerName = office.IdManagerstaffNavigation?.Name ?? string.Empty,
+                };
+                officeList.Add(officeDetails);
+            }
+
+            return officeList;
+        }
+
+        public async Task<vmOfficeDetails> GetOneOfficeFromID(int id)
+        {
+            var office = await _db.Offices
+                .FirstOrDefaultAsync(o => o.Id == id && o.Active == true);
+
+            if (office == null)
+            {
+                return new vmOfficeDetails();
+            }
+
+            // Staff tablosundan Manager Name'i çekiyoruz
+            var manager = await _db.Staff
+                .FirstOrDefaultAsync(s => s.Id == office.IdManagerstaff);
+
+            vmOfficeDetails officeDetails = new vmOfficeDetails
+            {
+                Id = office.Id,
+                OfficeName = office.OName ?? string.Empty,
+                Address = office.Address ?? string.Empty,
+                Crm = office.Crm ?? string.Empty,
+                ManagerName = manager?.Name ?? string.Empty, // Manager Name burada atanıyor
+            };
+
+            return officeDetails;
+        }
+
+        public async Task<Office> EditOfficeService(Office office)
+        {
+            if (office != null)
+            {
+                var existingOffice = await _db.Offices.FirstOrDefaultAsync(o => o.Id == office.Id);
+                if (existingOffice == null)
+                {
+                    return new Office(); // Avoid returning null
+                }
+
+                existingOffice.Address = office.Address ?? existingOffice.Address;
+                existingOffice.OName = office.OName ?? existingOffice.OName;
+                existingOffice.Crm = office.Crm ?? existingOffice.Crm;
+                existingOffice.IdManagerstaff = office.IdManagerstaff;
+
+                _db.Offices.Update(existingOffice);
+                await _db.SaveChangesAsync();
+                return existingOffice;
+            }
+            else
+            {
+                return new Office(); // Avoid returning null
+            }
+        }
+
+        public async Task<bool> DeleteOfficeService(int id)
+        {
+            var office = await _db.Offices.FirstOrDefaultAsync(o => o.Id == id);
+            if (office != null)
+            {
+                office.Active = false;
+                _db.Offices.Update(office);
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> AddStaffToOffice(int officeId, int staffId)
+        {
+            var office = await _db.Offices.FindAsync(officeId);
+            var staff = await _db.Staff.FindAsync(staffId);
+
+            if (office != null && staff != null)
+            {
+                var staffOffice = new StaffOffice
+                {
+                    IdOffice = officeId,
+                    IdStaff = staffId
+                };
+                _db.StaffOffices.Add(staffOffice);
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
+    }
+
+}

@@ -1,6 +1,6 @@
-@guveporrtapi_HostAddress = http://localhost:5172
+@GuvenPortAPI_HostAddress = http://localhost:5172
 
-GET {{guveporrtapi_HostAddress}}/weatherforecast/
+GET {{GuvenPortAPI_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
