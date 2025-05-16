@@ -206,6 +206,9 @@ public partial class isgportalContext : DbContext
             entity.Property(e => e.ExFileLocation)
                 .HasColumnType("character varying")
                 .HasColumnName("ex_file_location");
+            entity.Property(e => e.ExaminationType)
+                .HasColumnName("examination_type")
+                .HasConversion<string>();
             entity.Property(e => e.ExFilePrinted).HasColumnName("ex_file_printed");
             entity.Property(e => e.ExFilePrintedUploaded).HasColumnName("ex_file_printed_uploaded");
             entity.Property(e => e.ExIbys).HasColumnName("ex_ibys");

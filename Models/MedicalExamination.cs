@@ -25,6 +25,8 @@ public partial class MedicalExamination
     public bool? ExIbys { get; set; }
 
     public string? ExFileLocation { get; set; }
+    public ExamType? ExaminationType { get; set; }
+
 
     public bool? ExFilePrintedUploaded { get; set; }
     [JsonIgnore]

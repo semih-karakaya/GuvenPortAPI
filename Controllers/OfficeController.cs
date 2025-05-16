@@ -52,6 +52,34 @@ namespace GuvenPortAPI.Controllers
             return Ok(result); // Return 200 Ok with the added office
         }
 
+        [HttpGet("total-active-companies")]
+        public async Task<IActionResult> GetTotalActiveCompanies()
+        {
+            var total = await _officeService.GetTotalActiveCompaniesAsync();
+            return Ok(new { total_active_companies = total });
+        }
+
+        [HttpGet("{officeId}/active-workplaces")]
+        public async Task<IActionResult> GetActiveWorkplacesByOfficeId(int officeId)
+        {
+            var workplaces = await _officeService.GetActiveWorkplacesByOfficeIdAsync(officeId);
+            return Ok(workplaces);
+        }
+
+        [HttpGet("total-active-workplaces")]
+        public async Task<IActionResult> GetTotalActiveWorkplaces()
+        {
+            var total = await _officeService.GetTotalActiveWorkplacesAsync();
+            return Ok(new { total_active_workplaces = total });
+        }
+        [HttpGet("company-workplace-counts")]
+        public async Task<IActionResult> GetCompanyWorkplaceCounts()
+        {
+            var result = await _officeService.GetCompanyWorkplaceCountsAsync();
+            return Ok(result);
+        }
+
+
         /// <summary>
         /// Lists all active offices.
         /// </summary>
@@ -129,6 +157,12 @@ namespace GuvenPortAPI.Controllers
             }
 
             return Ok(result); // Return 200 Ok with the result (true)
+        }
+        [HttpGet("active-with-manager")]
+        public async Task<IActionResult> GetActiveOfficesWithManager()
+        {
+            var offices = await _officeService.GetActiveOfficesWithManagerAsync();
+            return Ok(offices);
         }
 
         // You can add more endpoints here for managing StaffOffice and Workplace relationships

@@ -25,7 +25,7 @@ public partial class Staff
     [JsonIgnore]
     public virtual ICollection<AccidentReportStaff> AccidentReportStaffs { get; set; } = new List<AccidentReportStaff>();
 
-    [JsonIgnore]
+    //[JsonIgnore]
     public virtual Doctor? Doctor { get; set; }
 
     [JsonIgnore]

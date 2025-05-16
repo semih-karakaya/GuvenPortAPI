@@ -53,6 +53,47 @@ namespace GuvenPortAPI.Service
                 return new Office(); // Avoid returning null
             }
         }
+        public async Task<int> GetTotalActiveCompaniesAsync()
+        {
+            using var context = new isgportalContext(); // Replace with your actual DbContext
+            return await context.Offices.CountAsync(o => o.Active == true);
+        }
+
+        public async Task<List<Workplace>> GetActiveWorkplacesByOfficeIdAsync(int officeId)
+        {
+            using var context = new isgportalContext(); // Replace with your actual DbContext
+            return await context.Workplaces
+                .Where(w => w.IdOffice == officeId && w.Active == true)
+                .ToListAsync();
+        }
+            
+        public async Task<int> GetTotalActiveWorkplacesAsync()
+        {
+            using var context = new isgportalContext(); // Replace with your actual DbContext
+            return await context.Workplaces.CountAsync(w => w.Active == true);
+        }
+
+        public async Task<List<CompanyWorkplaceCountDto>> GetCompanyWorkplaceCountsAsync()
+        {
+            using var context = new isgportalContext(); // Replace with your actual DbContext
+            var result = await (from o in context.Offices
+                                where o.Active == true
+                                join w in context.Workplaces.Where(x => x.Active == true)
+                                    on o.Id equals w.IdOffice into g
+                                from w in g.DefaultIfEmpty()
+                                group w by new { o.OName } into grp
+                                select new CompanyWorkplaceCountDto
+                                {
+                                    CompanyName = grp.Key.OName,
+                                    TotalWorkplaces = grp.Count(x => x != null)
+                                })
+                                .OrderByDescending(x => x.CompanyName)
+                                .ToListAsync();
+            return result;
+        }
+
+
+
 
         public async Task<List<vmOfficeDetails>> ListOfficeService()
         {
@@ -77,6 +118,31 @@ namespace GuvenPortAPI.Service
 
             return officeList;
         }
+        public async Task<List<EmployeeMedicalStatusDto>> GetEmployeesWithExpiredOrMissingMedicalAsync(int officeId)
+        {
+            var today = DateOnly.FromDateTime(DateTime.Today);
+
+            var query = from e in _db.Employees
+                        join c in _db.Contracts on e.Id equals c.IdEmployee
+                        join w in _db.Workplaces on c.IdWorkplace equals w.Id
+                        join o in _db.Offices on w.IdOffice equals o.Id
+                        where o.Id == officeId
+                        join m in _db.MedicalExaminations on c.Id equals m.IdContract into medGroup
+                        from m in medGroup.DefaultIfEmpty()
+                        group m by new { e.Id, e.Name } into g
+                        let lastValidExam = g.Max(x => x != null ? x.ValidityDate : null)
+                        where lastValidExam == null || lastValidExam < today
+                        select new EmployeeMedicalStatusDto
+                        {
+                            EmployeeId = g.Key.Id,
+                            EmployeeName = g.Key.Name,
+                            LastValidExam = lastValidExam,
+                            Status = lastValidExam == null ? "No medical examination" : "expired"
+                        };
+
+            return await query.OrderBy(x => x.LastValidExam).ToListAsync();
+        }
+
 
         public async Task<vmOfficeDetails> GetOneOfficeFromID(int id)
         {
@@ -129,6 +195,24 @@ namespace GuvenPortAPI.Service
             }
         }
 
+        public async Task<List<vmOfficeDetails>> GetActiveOfficesWithManagerAsync()
+        {
+            using var context = new isgportalContext(); // Use your actual DbContext
+            var result = await (from o in context.Offices
+                                where o.Active == true
+                                join s in context.Staff on o.IdManagerstaff equals s.Id into mgr
+                                from manager in mgr.DefaultIfEmpty()
+                                select new vmOfficeDetails
+                                {
+                                    Id = o.Id,
+                                    OfficeName = o.OName,
+                                    Address = o.Address,
+                                    Crm = o.Crm,
+                                    ManagerName = manager != null ? manager.Name : null
+                                }).ToListAsync();
+
+            return result;
+        }
         public async Task<bool> DeleteOfficeService(int id)
         {
             var office = await _db.Offices.FirstOrDefaultAsync(o => o.Id == id);

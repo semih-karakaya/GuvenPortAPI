@@ -12,6 +12,15 @@ namespace GuvenPortAPI.Models.Interface
         Task<Office> EditOfficeService(Office office);
         Task<bool> DeleteOfficeService(int id);
         Task<bool> AddStaffToOffice(int officeId, int staffId);
+        Task<List<vmOfficeDetails>> GetActiveOfficesWithManagerAsync();
+        Task<int> GetTotalActiveCompaniesAsync();
+        Task<List<Workplace>> GetActiveWorkplacesByOfficeIdAsync(int officeId);
+        Task<int> GetTotalActiveWorkplacesAsync();
+        Task<List<CompanyWorkplaceCountDto>> GetCompanyWorkplaceCountsAsync();
+
+        Task<List<EmployeeMedicalStatusDto>> GetEmployeesWithExpiredOrMissingMedicalAsync(int officeId);
+
+
     }
     public interface IWorkplaceService
     {
@@ -23,9 +32,21 @@ namespace GuvenPortAPI.Models.Interface
         Task<bool> AddStaffToWorkplace(int workplaceId, int staffId);
         Task<bool> RemoveStaffFromWorkplace(int workplaceId, int staffId);
         Task<Workplace> FindWorkplaceFromOfficeId(int officeId);
+        Task<List<MedicalExaminationDto>> GetMedicalExaminationsByEmployeeIdAsync(int employeeId);
+        Task<int> GetMedicalExaminationCountByEmployeeIdAsync(int employeeId);
+        Task<List<WorkplaceExamCountDto>> GetWorkplaceExamCountsAsync();
+        Task<List<EmployeeMedicalStatusDto>> GetOfficeEmployeesMedicalStatusAsync(int officeId);
+        Task<List<EmployeeWithoutEntryExamDto>> GetEmployeesWithoutEntryExamAsync();
+        Task<WorkplaceAccidentCountDto> GetWorkplaceAccidentCountAsync(int workplaceId, DateOnly startDate, DateOnly endDate);
+        Task<EmployeeDemographicsDto> GetEmployeeDemographicsAsync();
+        Task<EmployeeDemographicsDto> GetActiveContractEmployeeDemographicsAsync();
+        Task<EmployeeAccidentCountDto> GetEmployeeAccidentCountDtoAsync(int employeeId);
+        Task<List<MedicalExaminationWithDoctorDto>> GetMedicalExaminationsByDoctorIdAsync(int doctorId);
+        Task<int> GetMedicalExaminationCountByDoctorIdAsync(int doctorId);
+
 
     }
-        public interface IAccidentService
+    public interface IAccidentService
         {
             Task<Accident> AddAccidentAsync(Accident accident);
             Task<List<Accident>> GetAllAccidentsAsync();

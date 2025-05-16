@@ -44,9 +44,10 @@ namespace GuvenPortAPI.Service
 
         public async Task<bool> DeleteStaffAsync(int id)
         {
-            var staff = await _context.Staff.FindAsync(id); // Fixed: Staffs -> Staff
+            var staff = await _context.Staff.FindAsync(id);
             if (staff == null) return false;
-            _context.Staff.Remove(staff); // Fixed: Staffs -> Staff
+            staff.Active = false;
+            _context.Staff.Update(staff);
             await _context.SaveChangesAsync();
             return true;
         }

@@ -5,6 +5,7 @@ using GuvenPortAPI.Services.IoC;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using SwaggerThemes;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -51,7 +52,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(Theme.UniversalDark);
 }
 
 app.UseHttpsRedirection();
