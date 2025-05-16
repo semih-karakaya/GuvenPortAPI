@@ -8,10 +8,15 @@ namespace GuvenPortAPI.Services.IoC
     {
         public static void AddScopedService(this IServiceCollection services)
         {
-           //add.scoped yapilacak
-           services.AddScoped< IOfficeService,OfficeService>();
-           services.AddScoped< IWorkplaceService,WorkplaceService>();
-
+            // Add all services here
+            services.AddScoped<IOfficeService, OfficeService>();
+            services.AddScoped<IWorkplaceService, WorkplaceService>();
+            services.AddScoped<IStaffService, StaffService>();
+            services.AddScoped<IAccidentService, AccidentService>();
+            services.AddScoped<IContractService, ContractService>();
+            services.AddScoped<IEmployeeService, EmployeeService>();
+            services.AddScoped<IMedicalExaminationService, MedicalExaminationService>();
+            // Add other services as needed
         }
     }
 }
