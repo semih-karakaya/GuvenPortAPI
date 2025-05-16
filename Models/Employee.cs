@@ -2,6 +2,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace GuvenPortAPI.Models;
 
@@ -26,6 +27,6 @@ public partial class Employee
     public DateOnly? EntryDate { get; set; }
 
     public bool? Chronic { get; set; }
-
+    [JsonIgnore]
     public virtual ICollection<Contract> Contracts { get; set; } = new List<Contract>();
 }

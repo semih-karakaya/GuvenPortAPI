@@ -2,6 +2,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace GuvenPortAPI.Models;
 
@@ -26,8 +27,8 @@ public partial class MedicalExamination
     public string? ExFileLocation { get; set; }
 
     public bool? ExFilePrintedUploaded { get; set; }
-
+    [JsonIgnore]
     public virtual Contract? IdContractNavigation { get; set; }
-
+    [JsonIgnore]
     public virtual Doctor? IdDoctorNavigation { get; set; }
 }

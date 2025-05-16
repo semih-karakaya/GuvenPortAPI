@@ -2,14 +2,15 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace GuvenPortAPI.Models;
 
 public partial class Doctor
 {
     public int IdStaff { get; set; }
-
+    [JsonIgnore]
     public virtual Staff IdStaffNavigation { get; set; } = null!;
-
+    [JsonIgnore]
     public virtual ICollection<MedicalExamination> MedicalExaminations { get; set; } = new List<MedicalExamination>();
 }

@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -27,20 +27,26 @@ namespace GuvenPortAPI.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] StaffLoginRequest request)
         {
-            // Kullan?c?y? Staff tablosunda bul
+            // Kullanıcıyı Staff tablosunda bul
             var staffList = await _staffService.GetAllStaffAsync();
             var staff = staffList.FirstOrDefault(x => x.Mail == request.Mail && x.Password == request.Password);
 
             if (staff == null)
                 return Unauthorized("Invalid credentials.");
 
-            // JWT Token olu?tur
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, staff.Id.ToString()),
-                new Claim(ClaimTypes.Name, staff.Name ?? ""),
-                new Claim(ClaimTypes.Email, staff.Mail ?? "")
-            };
+            // Doktor mu kontrolü
+            bool isDoctor = staff.Doctor != null;
+
+            // JWT Token oluştur
+            var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, staff.Id.ToString()),
+        new Claim(ClaimTypes.Name, staff.Name ?? ""),
+        new Claim(ClaimTypes.Email, staff.Mail ?? "")
+    };
+
+            // İsteğe bağlı: Rolü claim olarak ekle
+            claims.Add(new Claim(ClaimTypes.Role, isDoctor ? "Doctor" : "Staff"));
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -55,8 +61,11 @@ namespace GuvenPortAPI.Controllers
 
             return Ok(new
             {
-                token = new JwtSecurityTokenHandler().WriteToken(token)
+                token = new JwtSecurityTokenHandler().WriteToken(token),
+                isDoctor // İstersen cevaba da ekleyebilirsin
             });
         }
+
     }
 }
+

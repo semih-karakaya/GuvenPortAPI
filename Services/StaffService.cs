@@ -24,8 +24,11 @@ namespace GuvenPortAPI.Service
 
         public async Task<List<Staff>> GetAllStaffAsync()
         {
-            return await _context.Staff.ToListAsync(); // Fixed: Staffs -> Staff
+            return await _context.Staff
+                .Include(s => s.Doctor)
+                .ToListAsync();
         }
+        
 
         public async Task<Staff> GetStaffByIdAsync(int id)
         {

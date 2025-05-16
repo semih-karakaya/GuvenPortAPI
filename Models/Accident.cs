@@ -2,6 +2,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace GuvenPortAPI.Models;
 
@@ -28,10 +29,10 @@ public partial class Accident
     public DateOnly? SgkInfoDate { get; set; }
 
     public bool? SgkInfoCheck { get; set; }
-
+    [JsonIgnore]
     public virtual ICollection<AccidentReportStaff> AccidentReportStaffs { get; set; } = new List<AccidentReportStaff>();
-
+    [JsonIgnore]
     public virtual ICollection<ContractAccident> ContractAccidents { get; set; } = new List<ContractAccident>();
-
+    [JsonIgnore]
     public virtual Workplace? IdWorkplaceNavigation { get; set; }
 }

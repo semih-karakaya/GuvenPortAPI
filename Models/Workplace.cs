@@ -2,6 +2,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace GuvenPortAPI.Models;
 
@@ -20,12 +21,12 @@ public partial class Workplace
     public int? IdOffice { get; set; }
 
     public int? HazardLevel { get; set; }
-
+    [JsonIgnore]
     public virtual ICollection<Accident> Accidents { get; set; } = new List<Accident>();
-
+    [JsonIgnore]
     public virtual ICollection<Contract> Contracts { get; set; } = new List<Contract>();
-
+    [JsonIgnore]
     public virtual Office? IdOfficeNavigation { get; set; }
-
+    [JsonIgnore]
     public virtual ICollection<StaffWorkplace> StaffWorkplaces { get; set; } = new List<StaffWorkplace>();
 }
