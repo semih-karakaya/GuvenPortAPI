@@ -29,7 +29,7 @@ namespace GuvenPortAPI.Controllers
         {
             // Kullanıcıyı Staff tablosunda bul
             var staffList = await _staffService.GetAllStaffAsync();
-            var staff = staffList.FirstOrDefault(x => x.Mail == request.Mail && x.Password == request.Password);
+            var staff = staffList.FirstOrDefault(x => x.Mail == request.mail && x.Password == request.password);
 
             if (staff == null)
                 return Unauthorized("Invalid credentials.");
@@ -62,7 +62,8 @@ namespace GuvenPortAPI.Controllers
             return Ok(new
             {
                 token = new JwtSecurityTokenHandler().WriteToken(token),
-                isDoctor // İstersen cevaba da ekleyebilirsin
+                isDoctor, // İstersen cevaba da ekleyebilirsin
+                Name = staff.Name
             });
         }
 
