@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
-
 namespace GuvenPortAPI.Models;
 
 public partial class MedicalExamination
@@ -25,10 +24,10 @@ public partial class MedicalExamination
     public bool? ExIbys { get; set; }
 
     public string? ExFileLocation { get; set; }
-    public ExamType? ExaminationType { get; set; }
-
 
     public bool? ExFilePrintedUploaded { get; set; }
+
+    public int? ExaminationType { get; set; }
     [JsonIgnore]
     public virtual Contract? IdContractNavigation { get; set; }
     [JsonIgnore]

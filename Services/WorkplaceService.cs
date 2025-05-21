@@ -44,7 +44,7 @@ namespace GuvenPortAPI.Service
         {
             if (workplace != null)
             {
-                _db.Workplaces.Add(workplace);
+                _db.Workplace.Add(workplace);
                 await _db.SaveChangesAsync();
                 return workplace;
             }
@@ -53,20 +53,30 @@ namespace GuvenPortAPI.Service
                 return new Workplace(); // Avoid returning null
             }
         }
+        public async Task<string?> GetWorkplaceNameByIdAsync(int workplaceId)
+        {
+            var name = await _db.Workplace
+                .Where(w => w.Id == workplaceId)
+                .Select(w => w.Name)
+                .FirstOrDefaultAsync();
+
+            return name;
+        }
+
         public async Task<List<EmployeeMedicalStatusDto>> GetOfficeEmployeesMedicalStatusAsync(int officeId)
         {
             var today = DateOnly.FromDateTime(DateTime.Today);
 
-            var query = from e in _db.Employees
-                        join c in _db.Contracts on e.Id equals c.IdEmployee
-                        join w in _db.Workplaces on c.IdWorkplace equals w.Id
-                        join o in _db.Offices on w.IdOffice equals o.Id
+            var query = from e in _db.Employee
+                        join c in _db.Contract on e.Id equals c.IdEmployee
+                        join w in _db.Workplace on c.IdWorkplace equals w.Id
+                        join o in _db.Office on w.IdOffice equals o.Id
                         where o.Id == officeId
                         select new
                         {
                             e.Id,
                             e.Name,
-                            ValidityDate = _db.MedicalExaminations
+                            ValidityDate = _db.MedicalExamination
                                 .Where(m => m.IdContract == c.Id)
                                 .Max(m => (DateOnly?)m.ValidityDate)
                         };
@@ -92,15 +102,15 @@ namespace GuvenPortAPI.Service
         }
         public async Task<List<MedicalExaminationDto>> GetMedicalExaminationsByEmployeeIdAsync(int employeeId)
         {
-            var result = await (from m in _db.MedicalExaminations
-                                join c in _db.Contracts on m.IdContract equals c.Id
+            var result = await (from m in _db.MedicalExamination
+                                join c in _db.Contract on m.IdContract equals c.Id
                                 where c.IdEmployee == employeeId
                                 select new MedicalExaminationDto
                                 {
                                     Id = m.Id,
                                     IdContract = m.IdContract,
                                     IdDoctor = m.IdDoctor,
-                                    ExamType = m.ExaminationType,
+                                    ExaminationType = m.ExaminationType,
                                     ValidityDate = m.ValidityDate
                                     // Map other properties as needed
                                 }).ToListAsync();
@@ -109,10 +119,10 @@ namespace GuvenPortAPI.Service
         }
         public async Task<List<WorkplaceExamCountDto>> GetWorkplaceExamCountsAsync()
         {
-            var result = await (from w in _db.Workplaces
-                                join c in _db.Contracts on w.Id equals c.IdWorkplace into wc
+            var result = await (from w in _db.Workplace
+                                join c in _db.Contract on w.Id equals c.IdWorkplace into wc
                                 from c in wc.DefaultIfEmpty()
-                                join m in _db.MedicalExaminations on c.Id equals m.IdContract into cm
+                                join m in _db.MedicalExamination on c.Id equals m.IdContract into cm
                                 from m in cm.DefaultIfEmpty()
                                 group m by w.Name into g
                                 select new WorkplaceExamCountDto
@@ -127,26 +137,26 @@ namespace GuvenPortAPI.Service
 
         public async Task<int> GetMedicalExaminationCountByEmployeeIdAsync(int employeeId)
         {
-            return await (from m in _db.MedicalExaminations
-                          join c in _db.Contracts on m.IdContract equals c.Id
+            return await (from m in _db.MedicalExamination
+                          join c in _db.Contract on m.IdContract equals c.Id
                           where c.IdEmployee == employeeId
                           select m).CountAsync();
         }
 
         public async Task<List<MedicalExaminationWithDoctorDto>> GetMedicalExaminationsByDoctorIdAsync(int doctorId)
         {
-            var result = await (from m in _db.MedicalExaminations join s in _db.Staff on m.IdDoctor equals s.Id where s.Id == doctorId select new MedicalExaminationWithDoctorDto { Id = m.Id, IdContract = m.IdContract, IdDoctor = m.IdDoctor, ExaminationType = m.ExaminationType, DoctorName = s.Name }).ToListAsync();
+            var result = await (from m in _db.MedicalExamination join s in _db.Staff on m.IdDoctor equals s.Id where s.Id == doctorId select new MedicalExaminationWithDoctorDto { Id = m.Id, IdContract = m.IdContract, IdDoctor = m.IdDoctor, ExaminationType = m.ExaminationType, DoctorName = s.Name }).ToListAsync();
             return result;
         }
 
         public async Task<int> GetMedicalExaminationCountByDoctorIdAsync(int doctorId) { 
-            return await _db.MedicalExaminations.CountAsync(m => m.IdDoctor == doctorId); 
+            return await _db.MedicalExamination.CountAsync(m => m.IdDoctor == doctorId); 
         }
 
 
         public async Task<EmployeeDemographicsDto> GetEmployeeDemographicsAsync()
         {
-            var result = await _db.Employees
+            var result = await _db.Employee
                 .Where(e => e.Active == true)
                 .GroupBy(e => 1)
                 .Select(g => new EmployeeDemographicsDto
@@ -164,8 +174,8 @@ namespace GuvenPortAPI.Service
         {
             var today = DateOnly.FromDateTime(DateTime.Today);
 
-            var result = await (from e in _db.Employees
-                                join c in _db.Contracts on e.Id equals c.IdEmployee
+            var result = await (from e in _db.Employee
+                                join c in _db.Contract on e.Id equals c.IdEmployee
                                 where e.Active == true
                                       && c.StartDate <= today
                                       && (c.EndDate == null || c.EndDate >= today)
@@ -184,8 +194,8 @@ namespace GuvenPortAPI.Service
         }
         public async Task<WorkplaceAccidentCountDto> GetWorkplaceAccidentCountAsync(int workplaceId, DateOnly startDate, DateOnly endDate)
         {
-            var result = await (from w in _db.Workplaces
-                                join a in _db.Accidents on w.Id equals a.IdWorkplace
+            var result = await (from w in _db.Workplace
+                                join a in _db.Accident on w.Id equals a.IdWorkplace
                                 where w.Id == workplaceId
                                       && a.AccDate >= startDate
                                       && a.AccDate <= endDate
@@ -200,9 +210,9 @@ namespace GuvenPortAPI.Service
         }
         public async Task<EmployeeAccidentCountDto> GetEmployeeAccidentCountDtoAsync(int employeeId)
         {
-            var count = await (from a in _db.Accidents
-                               join ca in _db.ContractAccidents on a.Id equals ca.IdAccident
-                               join c in _db.Contracts on ca.IdContract equals c.Id
+            var count = await (from a in _db.Accident
+                               join ca in _db.ContractAccident on a.Id equals ca.IdAccident
+                               join c in _db.Contract on ca.IdContract equals c.Id
                                where c.IdEmployee == employeeId
                                select a.Id)
                               .CountAsync();
@@ -218,13 +228,13 @@ namespace GuvenPortAPI.Service
         {
             var today = DateOnly.FromDateTime(DateTime.Today);
 
-            var query = from c in _db.Contracts
-                        join e in _db.Employees on c.IdEmployee equals e.Id
-                        join w in _db.Workplaces on c.IdWorkplace equals w.Id
+            var query = from c in _db.Contract
+                        join e in _db.Employee on c.IdEmployee equals e.Id
+                        join w in _db.Workplace on c.IdWorkplace equals w.Id
                         where (c.EndDate == null || c.EndDate > today)
-                        && !_db.MedicalExaminations.Any(me =>
+                        && !_db.MedicalExamination.Any(me =>
                             me.IdContract == c.Id &&
-                            me.ExaminationType == ExamType.IseGiris)
+                            me.ExaminationType == 1) //  1 is the code for entry exam
                         orderby c.StartDate descending
                         select new EmployeeWithoutEntryExamDto
                         {
@@ -237,14 +247,14 @@ namespace GuvenPortAPI.Service
 
         public async Task<List<Workplace>> ListWorkplaceService()
         {
-            return await _db.Workplaces
+            return await _db.Workplace
                             .Include(w => w.IdOfficeNavigation)
                             .ToListAsync();
         }
 
         public async Task<Workplace> GetOneWorkplaceFromID(int id)
         {
-            var workplace = await _db.Workplaces
+            var workplace = await _db.Workplace
                                       .Include(w => w.IdOfficeNavigation)
                                       .FirstOrDefaultAsync(w => w.Id == id);
 
@@ -255,7 +265,7 @@ namespace GuvenPortAPI.Service
         {
             if (workplace != null)
             {
-                var existingWorkplace = await _db.Workplaces.FirstOrDefaultAsync(w => w.Id == workplace.Id);
+                var existingWorkplace = await _db.Workplace.FirstOrDefaultAsync(w => w.Id == workplace.Id);
                 if (existingWorkplace == null)
                 {
                     return new Workplace(); // Avoid returning null
@@ -265,7 +275,7 @@ namespace GuvenPortAPI.Service
                 existingWorkplace.SocialSecurityNumber = workplace.SocialSecurityNumber ?? existingWorkplace.SocialSecurityNumber;
                 existingWorkplace.IdOffice = workplace.IdOffice;
 
-                _db.Workplaces.Update(existingWorkplace);
+                _db.Workplace.Update(existingWorkplace);
                 await _db.SaveChangesAsync();
                 return existingWorkplace;
             }
@@ -277,11 +287,11 @@ namespace GuvenPortAPI.Service
 
         public async Task<bool> DeleteWorkplaceService(int id)
         {
-            var workplace = await _db.Workplaces.FirstOrDefaultAsync(w => w.Id == id);
+            var workplace = await _db.Workplace.FirstOrDefaultAsync(w => w.Id == id);
             if (workplace != null)
             {
                 workplace.Active = false;
-                _db.Workplaces.Update(workplace);
+                _db.Workplace.Update(workplace);
                 await _db.SaveChangesAsync();
                 return true;
             }
@@ -293,7 +303,7 @@ namespace GuvenPortAPI.Service
 
         public async Task<bool> AddStaffToWorkplace(int workplaceId, int staffId)
         {
-            var workplace = await _db.Workplaces.FindAsync(workplaceId);
+            var workplace = await _db.Workplace.FindAsync(workplaceId);
             var staff = await _db.Staff.FindAsync(staffId);
 
             if (workplace != null && staff != null)
@@ -303,7 +313,7 @@ namespace GuvenPortAPI.Service
                     IdWorkplace = workplaceId,
                     IdStaff = staffId
                 };
-                _db.StaffWorkplaces.Add(staffWorkplace);
+                _db.StaffWorkplace.Add(staffWorkplace);
                 await _db.SaveChangesAsync();
                 return true;
             }
@@ -312,13 +322,13 @@ namespace GuvenPortAPI.Service
 
         public async Task<bool> RemoveStaffFromWorkplace(int workplaceId, int staffId)
         {
-            var staffWorkplace = await _db.StaffWorkplaces
+            var staffWorkplace = await _db.StaffWorkplace
                                           .FirstOrDefaultAsync(sw => sw.IdWorkplace == workplaceId && sw.IdStaff == staffId);
 
             if (staffWorkplace != null)
             {
                 staffWorkplace.IdStaffNavigation.Active = false;
-                _db.StaffWorkplaces.Update(staffWorkplace);
+                _db.StaffWorkplace.Update(staffWorkplace);
                 await _db.SaveChangesAsync();
                 return true;
             }
@@ -327,7 +337,7 @@ namespace GuvenPortAPI.Service
 
         public async Task<Workplace> FindWorkplaceFromOfficeId(int officeId)
         {
-            var workplace = await _db.Workplaces
+            var workplace = await _db.Workplace
                                      .Include(w => w.IdOfficeNavigation)
                                      .FirstOrDefaultAsync(w => w.IdOffice == officeId);
 

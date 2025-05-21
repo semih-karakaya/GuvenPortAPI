@@ -1,55 +1,39 @@
-﻿// using GuvenPortAPI.Models; // Make sure your models namespace is included here
-// using GuvenPortAPI.Service; // Make sure your service namespace is included here
-using System;
-using System.Text;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
-using System.Net.Http;
-using System.Security.Cryptography.X509Certificates;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Http;
-using System.IO;
-using System.Linq;
-using Newtonsoft.Json; // Keep if you use JsonConvert
-using Microsoft.AspNetCore.Authorization; // For the Authorize attribute
-using GuvenPortAPI.Models;
+﻿using GuvenPortAPI.Models;
 using GuvenPortAPI.Models.Interface;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-// Adjust the namespace to match your project structure
 namespace GuvenPortAPI.Controllers
 {
-    //[Authorize] // Apply authorization if needed
-    [Route("api/office")] // Define the base route for this controller
+    [Route("api/office")]
     [ApiController]
-    public class OfficeController : Controller
+    public class OfficeController : ControllerBase
     {
-        // Use the interface if you create one: private readonly IOfficeService _officeService;
-        private readonly IOfficeService _officeService; // Using the concrete class for now
+        private readonly IOfficeService _officeService;
 
-        public OfficeController(IOfficeService officeService) // Inject the OfficeService
+        public OfficeController(IOfficeService officeService)
         {
             _officeService = officeService;
         }
 
-        /// <summary>
-        /// Adds a new office to the database.
-        /// </summary>
-        /// <param name="office">The office object to add.</param>
-        /// <returns>The added office object or null if the operation fails.</returns>
-        [Route("AddOffice")]
-        [HttpPost]
-        public async Task<ActionResult<Office>> AddOfficeToDatabase(Office office)
+        [HttpPost("add")]
+        public async Task<ActionResult<Office>> AddOfficeToDatabase([FromBody] Office office)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var result = await _officeService.AddOfficeService(office);
 
             if (result == null)
             {
-                // Return a BadRequest or other appropriate status code if adding fails
                 return BadRequest("Failed to add office.");
             }
 
-            return Ok(result); // Return 200 Ok with the added office
+            return Ok(result);
         }
 
         [HttpGet("total-active-companies")]
@@ -58,13 +42,20 @@ namespace GuvenPortAPI.Controllers
             var total = await _officeService.GetTotalActiveCompaniesAsync();
             return Ok(new { total_active_companies = total });
         }
-
         [HttpGet("{officeId}/active-workplaces")]
         public async Task<IActionResult> GetActiveWorkplacesByOfficeId(int officeId)
         {
+            // Input validation for officeId can be added
             var workplaces = await _officeService.GetActiveWorkplacesByOfficeIdAsync(officeId);
+
+            if (workplaces == null || !workplaces.Any())
+            {
+                return NoContent(); // Return No Content if no workplaces found
+            }
+
             return Ok(workplaces);
         }
+
 
         [HttpGet("total-active-workplaces")]
         public async Task<IActionResult> GetTotalActiveWorkplaces()
@@ -72,117 +63,70 @@ namespace GuvenPortAPI.Controllers
             var total = await _officeService.GetTotalActiveWorkplacesAsync();
             return Ok(new { total_active_workplaces = total });
         }
-        [HttpGet("company-workplace-counts")]
-        public async Task<IActionResult> GetCompanyWorkplaceCounts()
-        {
-            var result = await _officeService.GetCompanyWorkplaceCountsAsync();
-            return Ok(result);
-        }
 
-
-        /// <summary>
-        /// Lists all active offices.
-        /// </summary>
-        /// <returns>A list of vmOfficeDetails objects representing the offices.</returns>
-        [Route("ListOfficesFunction")]
-        [HttpGet]
-        public async Task<ActionResult<List<vmOfficeDetails>>> ListOfficeFromDatabase()
+        // Tüm ofisleri listele
+        [HttpGet("all")]
+        public async Task<ActionResult<List<vmOfficeDetails>>> ListOffices()
         {
             var result = await _officeService.ListOfficeService();
 
             if (result == null || result.Count == 0)
             {
-                // Return NotFound if no offices are found
                 return NotFound("No offices found.");
             }
 
-            return Ok(result); // Return 200 Ok with the list of offices
+            return Ok(result);
         }
 
-        /// <summary>
-        /// Gets details for a single office by its ID.
-        /// </summary>
-        /// <param name="id">The ID of the office to retrieve.</param>
-        /// <returns>A vmOfficeDetails object representing the office or null if not found.</returns>
-        [HttpGet]
-        [Route("GetOfficeWithID/{id}")] // Use route parameter for ID
+        [HttpGet("{id}")]
         public async Task<ActionResult<vmOfficeDetails>> GetOfficeDetails(int id)
         {
             var result = await _officeService.GetOneOfficeFromID(id);
 
             if (result == null)
             {
-                // Return NotFound if the office is not found
                 return NotFound($"Office with ID {id} not found.");
             }
 
-            return Ok(result); // Return 200 Ok with the office details
+            return Ok(result);
         }
 
-        /// <summary>
-        /// Edits an existing office's details.
-        /// </summary>
-        /// <param name="office">The office object with updated details.</param>
-        /// <returns>The updated office object or null if the operation fails.</returns>
-        [Route("EditOffice")]
-        [HttpPut]
-        public async Task<ActionResult<Office>> EditOfficeInDatabase(Office office)
+        [HttpPut("edit")]
+        public async Task<ActionResult<Office>> EditOfficeInDatabase([FromBody] Office office)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var updatedOffice = await _officeService.EditOfficeService(office);
 
             if (updatedOffice == null)
             {
-                // Return NotFound if the office to edit is not found, or BadRequest if other issues
                 return NotFound($"Office with ID {office.Id} not found or failed to update.");
             }
 
-            return Ok(updatedOffice); // Return 200 Ok with the updated office
+            return Ok(updatedOffice);
         }
 
-        /// <summary>
-        /// Deletes (marks as inactive) an office by its ID.
-        /// </summary>
-        /// <param name="id">The ID of the office to delete.</param>
-        /// <returns>True if the deletion was successful, false otherwise.</returns>
-        [HttpDelete] // Use HttpDelete for deletion
-        [Route("DeleteOffice/{id}")] // Use route parameter for ID
+        [HttpDelete("{id}")]
         public async Task<ActionResult<bool>> DeleteOffice(int id)
         {
             var result = await _officeService.DeleteOfficeService(id);
 
             if (!result)
             {
-                // Return NotFound if the office is not found
                 return NotFound($"Office with ID {id} not found.");
             }
 
-            return Ok(result); // Return 200 Ok with the result (true)
+            return Ok(result);
         }
+
         [HttpGet("active-with-manager")]
         public async Task<IActionResult> GetActiveOfficesWithManager()
         {
             var offices = await _officeService.GetActiveOfficesWithManagerAsync();
             return Ok(offices);
         }
-
-        // You can add more endpoints here for managing StaffOffice and Workplace relationships
-        // For example:
-        // [HttpPost("AddStaffToOffice/{officeId}/{staffId}")]
-        // public async Task<ActionResult<bool>> AddStaffToOffice(int officeId, int staffId)
-        // {
-        //     var result = await _officeService.AddStaffToOffice(officeId, staffId);
-        //     if (!result) return BadRequest("Failed to add staff to office.");
-        //     return Ok(result);
-        // }
-
-        // [HttpDelete("RemoveStaffFromOffice/{officeId}/{staffId}")]
-        // public async Task<ActionResult<bool>> RemoveStaffFromOffice(int officeId, int staffId)
-        // {
-        //     var result = await _officeService.RemoveStaffFromOffice(officeId, staffId);
-        //     if (!result) return NotFound("Staff not found in this office.");
-        //     return Ok(result);
-        // }
-
-        // Add similar endpoints for Workplaces
     }
 }

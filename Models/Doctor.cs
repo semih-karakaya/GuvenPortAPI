@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
-
 namespace GuvenPortAPI.Models;
 
 public partial class Doctor
@@ -12,5 +11,5 @@ public partial class Doctor
     [JsonIgnore]
     public virtual Staff IdStaffNavigation { get; set; } = null!;
     [JsonIgnore]
-    public virtual ICollection<MedicalExamination> MedicalExaminations { get; set; } = new List<MedicalExamination>();
+    public virtual ICollection<MedicalExamination> MedicalExamination { get; set; } = new List<MedicalExamination>();
 }

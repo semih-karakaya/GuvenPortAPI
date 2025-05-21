@@ -1,5 +1,5 @@
 ﻿using GuvenPortAPI.Models;
-
+using Newtonsoft.Json;
 namespace GuvenPortAPI.Models
 {
     public class vmOfficeDetails

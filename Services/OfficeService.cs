@@ -44,7 +44,7 @@ namespace GuvenPortAPI.Service
         {
             if (office != null)
             {
-                _db.Offices.Add(office);
+                _db.Office.Add(office);
                 await _db.SaveChangesAsync();
                 return office;
             }
@@ -56,13 +56,13 @@ namespace GuvenPortAPI.Service
         public async Task<int> GetTotalActiveCompaniesAsync()
         {
             using var context = new isgportalContext(); // Replace with your actual DbContext
-            return await context.Offices.CountAsync(o => o.Active == true);
+            return await context.Office.CountAsync(o => o.Active == true);
         }
 
         public async Task<List<Workplace>> GetActiveWorkplacesByOfficeIdAsync(int officeId)
         {
             using var context = new isgportalContext(); // Replace with your actual DbContext
-            return await context.Workplaces
+            return await context.Workplace
                 .Where(w => w.IdOffice == officeId && w.Active == true)
                 .ToListAsync();
         }
@@ -70,15 +70,15 @@ namespace GuvenPortAPI.Service
         public async Task<int> GetTotalActiveWorkplacesAsync()
         {
             using var context = new isgportalContext(); // Replace with your actual DbContext
-            return await context.Workplaces.CountAsync(w => w.Active == true);
+            return await context.Workplace.CountAsync(w => w.Active == true);
         }
 
         public async Task<List<CompanyWorkplaceCountDto>> GetCompanyWorkplaceCountsAsync()
         {
             using var context = new isgportalContext(); // Replace with your actual DbContext
-            var result = await (from o in context.Offices
+            var result = await (from o in context.Office
                                 where o.Active == true
-                                join w in context.Workplaces.Where(x => x.Active == true)
+                                join w in context.Workplace.Where(x => x.Active == true)
                                     on o.Id equals w.IdOffice into g
                                 from w in g.DefaultIfEmpty()
                                 group w by new { o.OName } into grp
@@ -99,7 +99,7 @@ namespace GuvenPortAPI.Service
         {
             List<vmOfficeDetails> officeList = new List<vmOfficeDetails>();
 
-            var offices = await _db.Offices
+            var offices = await _db.Office
                                  .Include(o => o.IdManagerstaffNavigation)
                                  .Where(o => o.Active != false)
                                  .ToListAsync();
@@ -122,12 +122,12 @@ namespace GuvenPortAPI.Service
         {
             var today = DateOnly.FromDateTime(DateTime.Today);
 
-            var query = from e in _db.Employees
-                        join c in _db.Contracts on e.Id equals c.IdEmployee
-                        join w in _db.Workplaces on c.IdWorkplace equals w.Id
-                        join o in _db.Offices on w.IdOffice equals o.Id
+            var query = from e in _db.Employee
+                        join c in _db.Contract on e.Id equals c.IdEmployee
+                        join w in _db.Workplace on c.IdWorkplace equals w.Id
+                        join o in _db.Office on w.IdOffice equals o.Id
                         where o.Id == officeId
-                        join m in _db.MedicalExaminations on c.Id equals m.IdContract into medGroup
+                        join m in _db.MedicalExamination on c.Id equals m.IdContract into medGroup
                         from m in medGroup.DefaultIfEmpty()
                         group m by new { e.Id, e.Name } into g
                         let lastValidExam = g.Max(x => x != null ? x.ValidityDate : null)
@@ -146,7 +146,7 @@ namespace GuvenPortAPI.Service
 
         public async Task<vmOfficeDetails> GetOneOfficeFromID(int id)
         {
-            var office = await _db.Offices
+            var office = await _db.Office
                 .FirstOrDefaultAsync(o => o.Id == id && o.Active == true);
 
             if (office == null)
@@ -174,7 +174,7 @@ namespace GuvenPortAPI.Service
         {
             if (office != null)
             {
-                var existingOffice = await _db.Offices.FirstOrDefaultAsync(o => o.Id == office.Id);
+                var existingOffice = await _db.Office.FirstOrDefaultAsync(o => o.Id == office.Id);
                 if (existingOffice == null)
                 {
                     return new Office(); // Avoid returning null
@@ -185,7 +185,7 @@ namespace GuvenPortAPI.Service
                 existingOffice.Crm = office.Crm ?? existingOffice.Crm;
                 existingOffice.IdManagerstaff = office.IdManagerstaff;
 
-                _db.Offices.Update(existingOffice);
+                _db.Office.Update(existingOffice);
                 await _db.SaveChangesAsync();
                 return existingOffice;
             }
@@ -198,7 +198,7 @@ namespace GuvenPortAPI.Service
         public async Task<List<vmOfficeDetails>> GetActiveOfficesWithManagerAsync()
         {
             using var context = new isgportalContext(); // Use your actual DbContext
-            var result = await (from o in context.Offices
+            var result = await (from o in context.Office
                                 where o.Active == true
                                 join s in context.Staff on o.IdManagerstaff equals s.Id into mgr
                                 from manager in mgr.DefaultIfEmpty()
@@ -215,11 +215,11 @@ namespace GuvenPortAPI.Service
         }
         public async Task<bool> DeleteOfficeService(int id)
         {
-            var office = await _db.Offices.FirstOrDefaultAsync(o => o.Id == id);
+            var office = await _db.Office.FirstOrDefaultAsync(o => o.Id == id);
             if (office != null)
             {
                 office.Active = false;
-                _db.Offices.Update(office);
+                _db.Office.Update(office);
                 await _db.SaveChangesAsync();
                 return true;
             }
@@ -231,7 +231,7 @@ namespace GuvenPortAPI.Service
 
         public async Task<bool> AddStaffToOffice(int officeId, int staffId)
         {
-            var office = await _db.Offices.FindAsync(officeId);
+            var office = await _db.Office.FindAsync(officeId);
             var staff = await _db.Staff.FindAsync(staffId);
 
             if (office != null && staff != null)
@@ -241,7 +241,7 @@ namespace GuvenPortAPI.Service
                     IdOffice = officeId,
                     IdStaff = staffId
                 };
-                _db.StaffOffices.Add(staffOffice);
+                _db.StaffOffice.Add(staffOffice);
                 await _db.SaveChangesAsync();
                 return true;
             }

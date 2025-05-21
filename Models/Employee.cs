@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
-
 namespace GuvenPortAPI.Models;
 
 public partial class Employee
@@ -28,5 +27,5 @@ public partial class Employee
 
     public bool? Chronic { get; set; }
     [JsonIgnore]
-    public virtual ICollection<Contract> Contracts { get; set; } = new List<Contract>();
+    public virtual ICollection<Contract> Contract { get; set; } = new List<Contract>();
 }

@@ -24,6 +24,9 @@ builder.Services.AddCors(options =>
         policy.WithOrigins("https://localhost:44387") // Razor Pages portunu yaz
               .AllowAnyHeader()
               .AllowAnyMethod();
+        policy.WithOrigins("https://localhost:5078") // Razor Pages portunu yaz
+              .AllowAnyHeader()
+              .AllowAnyMethod();
     });
 });
 

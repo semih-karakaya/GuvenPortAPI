@@ -21,19 +21,13 @@ public partial class Staff
     public DateOnly? Dob { get; set; }
 
     public bool? Active { get; set; }
-
     [JsonIgnore]
-    public virtual ICollection<AccidentReportStaff> AccidentReportStaffs { get; set; } = new List<AccidentReportStaff>();
-
-    //[JsonIgnore]
+    public virtual ICollection<AccidentReportStaff> AccidentReportStaff { get; set; } = new List<AccidentReportStaff>();
     public virtual Doctor? Doctor { get; set; }
-
     [JsonIgnore]
-    public virtual ICollection<Office> Offices { get; set; } = new List<Office>();
-
+    public virtual ICollection<Office> Office { get; set; } = new List<Office>();
     [JsonIgnore]
-    public virtual ICollection<StaffOffice> StaffOffices { get; set; } = new List<StaffOffice>();
-
+    public virtual ICollection<StaffOffice> StaffOffice { get; set; } = new List<StaffOffice>();
     [JsonIgnore]
-    public virtual ICollection<StaffWorkplace> StaffWorkplaces { get; set; } = new List<StaffWorkplace>();
+    public virtual ICollection<StaffWorkplace> StaffWorkplace { get; set; } = new List<StaffWorkplace>();
 }

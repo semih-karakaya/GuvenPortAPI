@@ -2,7 +2,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-
+using System.Text.Json.Serialization;
 namespace GuvenPortAPI.Models;
 
 public partial class AccidentReportStaff
@@ -10,8 +10,8 @@ public partial class AccidentReportStaff
     public int IdAccident { get; set; }
 
     public int IdStaff { get; set; }
-
+    [JsonIgnore]
     public virtual Accident IdAccidentNavigation { get; set; } = null!;
-
+    [JsonIgnore]
     public virtual Staff IdStaffNavigation { get; set; } = null!;
 }

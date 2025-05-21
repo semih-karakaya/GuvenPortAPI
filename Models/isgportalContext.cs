@@ -17,39 +17,39 @@ public partial class isgportalContext : DbContext
     {
     }
 
-    public virtual DbSet<Accident> Accidents { get; set; }
+    public virtual DbSet<Accident> Accident { get; set; }
 
-    public virtual DbSet<AccidentReportStaff> AccidentReportStaffs { get; set; }
+    public virtual DbSet<AccidentReportStaff> AccidentReportStaff { get; set; }
 
-    public virtual DbSet<Contract> Contracts { get; set; }
+    public virtual DbSet<Contract> Contract { get; set; }
 
-    public virtual DbSet<ContractAccident> ContractAccidents { get; set; }
+    public virtual DbSet<ContractAccident> ContractAccident { get; set; }
 
-    public virtual DbSet<ContractAndJob> ContractAndJobs { get; set; }
+    public virtual DbSet<ContractAndJob> ContractAndJob { get; set; }
 
-    public virtual DbSet<Doctor> Doctors { get; set; }
+    public virtual DbSet<Doctor> Doctor { get; set; }
 
-    public virtual DbSet<Employee> Employees { get; set; }
+    public virtual DbSet<Employee> Employee { get; set; }
 
-    public virtual DbSet<MedicalExamination> MedicalExaminations { get; set; }
+    public virtual DbSet<MedicalExamination> MedicalExamination { get; set; }
 
-    public virtual DbSet<Office> Offices { get; set; }
+    public virtual DbSet<Office> Office { get; set; }
 
     public virtual DbSet<Staff> Staff { get; set; }
 
-    public virtual DbSet<StaffOffice> StaffOffices { get; set; }
+    public virtual DbSet<StaffOffice> StaffOffice { get; set; }
 
-    public virtual DbSet<StaffWorkplace> StaffWorkplaces { get; set; }
+    public virtual DbSet<StaffWorkplace> StaffWorkplace { get; set; }
 
-    public virtual DbSet<Workplace> Workplaces { get; set; }
+    public virtual DbSet<Workplace> Workplace { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseNpgsql("Host=localhost;Database=isgportal;Username=postgres;Password=159951");
+        => optionsBuilder.UseNpgsql("Host=localhost;Database=isgportal;Username=postgres;Password=159951;Persist Security Info=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.HasPostgresEnum("exam_type", new[] { "İşe Giriş", "Periyodik", "Kaza Sonrası" });
+        modelBuilder.HasPostgresEnum("exam_type", new[] { "İşe Giriş", "Periyodik", "Kaza Sonrası", "IseGiris", "KazaSonrasi" });
 
         modelBuilder.Entity<Accident>(entity =>
         {
@@ -69,7 +69,7 @@ public partial class isgportalContext : DbContext
             entity.Property(e => e.SgkInfoDate).HasColumnName("sgk_info_date");
             entity.Property(e => e.StoryOfAccident).HasColumnName("story_of_accident");
 
-            entity.HasOne(d => d.IdWorkplaceNavigation).WithMany(p => p.Accidents)
+            entity.HasOne(d => d.IdWorkplaceNavigation).WithMany(p => p.Accident)
                 .HasForeignKey(d => d.IdWorkplace)
                 .HasConstraintName("accident_id_workplace_fkey");
         });
@@ -83,12 +83,11 @@ public partial class isgportalContext : DbContext
             entity.Property(e => e.IdAccident).HasColumnName("id_accident");
             entity.Property(e => e.IdStaff).HasColumnName("id_staff");
 
-            entity.HasOne(d => d.IdAccidentNavigation).WithMany(p => p.AccidentReportStaffs)
+            entity.HasOne(d => d.IdAccidentNavigation).WithMany(p => p.AccidentReportStaff)
                 .HasForeignKey(d => d.IdAccident)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("accident_report_staff_id_accident_fkey");
 
-            entity.HasOne(d => d.IdStaffNavigation).WithMany(p => p.AccidentReportStaffs)
+            entity.HasOne(d => d.IdStaffNavigation).WithMany(p => p.AccidentReportStaff)
                 .HasForeignKey(d => d.IdStaff)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("accident_report_staff_id_staff_fkey");
@@ -110,11 +109,11 @@ public partial class isgportalContext : DbContext
             entity.Property(e => e.IdWorkplace).HasColumnName("id_workplace");
             entity.Property(e => e.StartDate).HasColumnName("start_date");
 
-            entity.HasOne(d => d.IdEmployeeNavigation).WithMany(p => p.Contracts)
+            entity.HasOne(d => d.IdEmployeeNavigation).WithMany(p => p.Contract)
                 .HasForeignKey(d => d.IdEmployee)
                 .HasConstraintName("contract_id_employee_fkey");
 
-            entity.HasOne(d => d.IdWorkplaceNavigation).WithMany(p => p.Contracts)
+            entity.HasOne(d => d.IdWorkplaceNavigation).WithMany(p => p.Contract)
                 .HasForeignKey(d => d.IdWorkplace)
                 .HasConstraintName("contract_id_workplace_fkey");
         });
@@ -128,11 +127,11 @@ public partial class isgportalContext : DbContext
             entity.Property(e => e.IdContract).HasColumnName("id_contract");
             entity.Property(e => e.IdAccident).HasColumnName("id_accident");
 
-            entity.HasOne(d => d.IdAccidentNavigation).WithMany(p => p.ContractAccidents)
+            entity.HasOne(d => d.IdAccidentNavigation).WithMany(p => p.ContractAccident)
                 .HasForeignKey(d => d.IdAccident)
                 .HasConstraintName("contract_accident_id_accident_fkey");
 
-            entity.HasOne(d => d.IdContractNavigation).WithMany(p => p.ContractAccidents)
+            entity.HasOne(d => d.IdContractNavigation).WithMany(p => p.ContractAccident)
                 .HasForeignKey(d => d.IdContract)
                 .HasConstraintName("contract_accident_id_contract_fkey");
         });
@@ -206,22 +205,20 @@ public partial class isgportalContext : DbContext
             entity.Property(e => e.ExFileLocation)
                 .HasColumnType("character varying")
                 .HasColumnName("ex_file_location");
-            entity.Property(e => e.ExaminationType)
-                .HasColumnName("examination_type")
-                .HasConversion<string>();
             entity.Property(e => e.ExFilePrinted).HasColumnName("ex_file_printed");
             entity.Property(e => e.ExFilePrintedUploaded).HasColumnName("ex_file_printed_uploaded");
             entity.Property(e => e.ExIbys).HasColumnName("ex_ibys");
+            entity.Property(e => e.ExaminationType).HasColumnName("examination_type");
             entity.Property(e => e.IdContract).HasColumnName("id_contract");
             entity.Property(e => e.IdDoctor).HasColumnName("id_doctor");
             entity.Property(e => e.IsDisabled).HasColumnName("is_disabled");
             entity.Property(e => e.ValidityDate).HasColumnName("validity_date");
 
-            entity.HasOne(d => d.IdContractNavigation).WithMany(p => p.MedicalExaminations)
+            entity.HasOne(d => d.IdContractNavigation).WithMany(p => p.MedicalExamination)
                 .HasForeignKey(d => d.IdContract)
                 .HasConstraintName("medical_examination_id_contract_fkey");
 
-            entity.HasOne(d => d.IdDoctorNavigation).WithMany(p => p.MedicalExaminations)
+            entity.HasOne(d => d.IdDoctorNavigation).WithMany(p => p.MedicalExamination)
                 .HasForeignKey(d => d.IdDoctor)
                 .HasConstraintName("medical_examination_id_staff_fkey");
         });
@@ -245,7 +242,7 @@ public partial class isgportalContext : DbContext
                 .HasMaxLength(255)
                 .HasColumnName("o_name");
 
-            entity.HasOne(d => d.IdManagerstaffNavigation).WithMany(p => p.Offices)
+            entity.HasOne(d => d.IdManagerstaffNavigation).WithMany(p => p.Office)
                 .HasForeignKey(d => d.IdManagerstaff)
                 .HasConstraintName("office_id_managerstaff_fkey");
         });
@@ -282,12 +279,12 @@ public partial class isgportalContext : DbContext
             entity.Property(e => e.IdStaff).HasColumnName("id_staff");
             entity.Property(e => e.IdOffice).HasColumnName("id_office");
 
-            entity.HasOne(d => d.IdOfficeNavigation).WithMany(p => p.StaffOffices)
+            entity.HasOne(d => d.IdOfficeNavigation).WithMany(p => p.StaffOffice)
                 .HasForeignKey(d => d.IdOffice)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("staff_office_id_office_fkey");
 
-            entity.HasOne(d => d.IdStaffNavigation).WithMany(p => p.StaffOffices)
+            entity.HasOne(d => d.IdStaffNavigation).WithMany(p => p.StaffOffice)
                 .HasForeignKey(d => d.IdStaff)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("staff_office_id_staff_fkey");
@@ -302,12 +299,12 @@ public partial class isgportalContext : DbContext
             entity.Property(e => e.IdStaff).HasColumnName("id_staff");
             entity.Property(e => e.IdWorkplace).HasColumnName("id_workplace");
 
-            entity.HasOne(d => d.IdStaffNavigation).WithMany(p => p.StaffWorkplaces)
+            entity.HasOne(d => d.IdStaffNavigation).WithMany(p => p.StaffWorkplace)
                 .HasForeignKey(d => d.IdStaff)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("staff_workplace_id_staff_fkey");
 
-            entity.HasOne(d => d.IdWorkplaceNavigation).WithMany(p => p.StaffWorkplaces)
+            entity.HasOne(d => d.IdWorkplaceNavigation).WithMany(p => p.StaffWorkplace)
                 .HasForeignKey(d => d.IdWorkplace)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("staff_workplace_id_workplace_fkey");
@@ -335,7 +332,7 @@ public partial class isgportalContext : DbContext
                 .HasMaxLength(20)
                 .HasColumnName("social_security_number");
 
-            entity.HasOne(d => d.IdOfficeNavigation).WithMany(p => p.Workplaces)
+            entity.HasOne(d => d.IdOfficeNavigation).WithMany(p => p.Workplace)
                 .HasForeignKey(d => d.IdOffice)
                 .HasConstraintName("workplace_id_office_fkey");
         });

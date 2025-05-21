@@ -18,7 +18,7 @@ namespace GuvenPortAPI.Controllers
         }
 
         [HttpPost("AddMedicalExamination")]
-        public async Task<ActionResult<MedicalExamination>> AddMedicalExamination([FromBody] MedicalExamination examination)
+        public async Task<ActionResult<MedicalExaminationDto>> AddMedicalExamination([FromBody] MedicalExaminationDto examination)
         {
             var result = await _medicalExaminationService.AddMedicalExaminationAsync(examination);
             if (result == null) return BadRequest("Failed to add medical examination.");
@@ -26,7 +26,7 @@ namespace GuvenPortAPI.Controllers
         }
 
         [HttpGet("ListMedicalExaminations")]
-        public async Task<ActionResult<List<MedicalExamination>>> ListMedicalExaminations()
+        public async Task<ActionResult<List<MedicalExaminationDto>>> ListMedicalExaminations()
         {
             var result = await _medicalExaminationService.GetAllMedicalExaminationsAsync();
             if (result == null || result.Count == 0) return NotFound("No medical examinations found.");
@@ -34,7 +34,7 @@ namespace GuvenPortAPI.Controllers
         }
 
         [HttpGet("GetMedicalExamination/{id}")]
-        public async Task<ActionResult<MedicalExamination>> GetMedicalExamination(int id)
+        public async Task<ActionResult<MedicalExaminationDto>> GetMedicalExamination(int id)
         {
             var result = await _medicalExaminationService.GetMedicalExaminationByIdAsync(id);
             if (result == null) return NotFound($"Medical examination with ID {id} not found.");
@@ -42,7 +42,7 @@ namespace GuvenPortAPI.Controllers
         }
 
         [HttpPut("EditMedicalExamination")]
-        public async Task<ActionResult<MedicalExamination>> EditMedicalExamination([FromBody] MedicalExamination examination)
+        public async Task<ActionResult<MedicalExaminationDto>> EditMedicalExamination([FromBody] MedicalExaminationDto examination)
         {
             var result = await _medicalExaminationService.UpdateMedicalExaminationAsync(examination);
             if (result == null) return NotFound("Failed to update medical examination.");

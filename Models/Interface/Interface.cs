@@ -1,6 +1,7 @@
 ﻿
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GuvenPortAPI.Models.DTOs;
 
 namespace GuvenPortAPI.Models.Interface
 {
@@ -29,6 +30,7 @@ namespace GuvenPortAPI.Models.Interface
         Task<Workplace> GetOneWorkplaceFromID(int id);
         Task<Workplace> EditWorkplaceService(Workplace workplace);
         Task<bool> DeleteWorkplaceService(int id);
+        Task<string?> GetWorkplaceNameByIdAsync(int workplaceId);
         Task<bool> AddStaffToWorkplace(int workplaceId, int staffId);
         Task<bool> RemoveStaffFromWorkplace(int workplaceId, int staffId);
         Task<Workplace> FindWorkplaceFromOfficeId(int officeId);
@@ -53,7 +55,17 @@ namespace GuvenPortAPI.Models.Interface
             Task<Accident> GetAccidentByIdAsync(int id);
             Task<Accident> UpdateAccidentAsync(Accident accident);
             Task<bool> DeleteAccidentAsync(int id);
-        }
+            Task<bool> AddStaffToAccidentAsync(int accidentId, int staffId);
+            Task<bool> RemoveStaffFromAccidentAsync(int accidentId, int staffId);
+            Task<List<Staff>> GetStaffByAccidentAsync(int accidentId);
+            Task<List<Accident>> GetAccidentsByStaffAsync(int staffId); // optional
+            Task<bool> AddContractToAccidentAsync(int accidentId, int contractId);
+            Task<bool> RemoveContractFromAccidentAsync(int accidentId, int contractId);
+            Task<List<Contract>> GetContractsByAccidentAsync(int accidentId);
+            Task<List<Accident>> GetAccidentsByContractAsync(int contractId);
+
+
+    }
     public interface IContractService
     {
         Task<Contract> AddContractAsync(Contract contract);
@@ -61,13 +73,14 @@ namespace GuvenPortAPI.Models.Interface
         Task<Contract> GetContractByIdAsync(int id);
         Task<Contract> UpdateContractAsync(Contract contract);
         Task<bool> DeleteContractAsync(int id);
+        Task<List<ContractWithEmployeesDto>> GetActiveContractsWithEmployeesByWorkplaceIdAsync(int workplaceId);
     }
     public interface IEmployeeService
     {
-        Task<Employee> AddEmployeeAsync(Employee employee);
-        Task<List<Employee>> GetAllEmployeesAsync();
-        Task<Employee> GetEmployeeByIdAsync(int id);
-        Task<Employee> UpdateEmployeeAsync(Employee employee);
+        Task<EmployeeDto> AddEmployeeAsync(EmployeeDto employee);
+        Task<List<EmployeeDto>> GetAllEmployeesAsync();
+        Task<EmployeeDto> GetEmployeeByIdAsync(int id);
+        Task<EmployeeDto> UpdateEmployeeAsync(EmployeeDto employee);
         Task<bool> DeleteEmployeeAsync(int id);
     }
     public interface IStaffService
@@ -80,12 +93,13 @@ namespace GuvenPortAPI.Models.Interface
     }
     public interface IMedicalExaminationService
     {
-        Task<MedicalExamination> AddMedicalExaminationAsync(MedicalExamination examination);
-        Task<List<MedicalExamination>> GetAllMedicalExaminationsAsync();
-        Task<MedicalExamination> GetMedicalExaminationByIdAsync(int id);
-        Task<MedicalExamination> UpdateMedicalExaminationAsync(MedicalExamination examination);
+        Task<MedicalExaminationDto> AddMedicalExaminationAsync(MedicalExaminationDto examination);
+        Task<List<MedicalExaminationDto>> GetAllMedicalExaminationsAsync();
+        Task<MedicalExaminationDto> GetMedicalExaminationByIdAsync(int id);
+        Task<MedicalExaminationDto> UpdateMedicalExaminationAsync(MedicalExaminationDto examination);
         Task<bool> DeleteMedicalExaminationAsync(int id);
     }
+
 }
 
 

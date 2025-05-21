@@ -29,10 +29,10 @@ public partial class Accident
     public DateOnly? SgkInfoDate { get; set; }
 
     public bool? SgkInfoCheck { get; set; }
-    [JsonIgnore]
-    public virtual ICollection<AccidentReportStaff> AccidentReportStaffs { get; set; } = new List<AccidentReportStaff>();
-    [JsonIgnore]
-    public virtual ICollection<ContractAccident> ContractAccidents { get; set; } = new List<ContractAccident>();
+   
+    public virtual ICollection<AccidentReportStaff> AccidentReportStaff { get; set; } = new List<AccidentReportStaff>();
+  
+    public virtual ICollection<ContractAccident> ContractAccident { get; set; } = new List<ContractAccident>();
     [JsonIgnore]
     public virtual Workplace? IdWorkplaceNavigation { get; set; }
 }

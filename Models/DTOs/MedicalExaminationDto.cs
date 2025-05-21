@@ -11,5 +11,5 @@ public class MedicalExaminationDto
     public bool? ExIbys { get; set; }
     public string? ExFileLocation { get; set; }
     public bool? ExFilePrintedUploaded { get; set; }
-    public ExamType? ExamType { get; set; }
+    public int? ExaminationType { get; set; }
 }

@@ -2,6 +2,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace GuvenPortAPI.Models;
 
@@ -10,8 +11,8 @@ public partial class ContractAccident
     public int IdContract { get; set; }
 
     public int IdAccident { get; set; }
-
+    [JsonIgnore]
     public virtual Accident IdAccidentNavigation { get; set; } = null!;
-
+    [JsonIgnore]
     public virtual Contract IdContractNavigation { get; set; } = null!;
 }

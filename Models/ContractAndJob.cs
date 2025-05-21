@@ -2,6 +2,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace GuvenPortAPI.Models;
 
@@ -10,6 +11,6 @@ public partial class ContractAndJob
     public int? IdContract { get; set; }
 
     public string? JobType { get; set; }
-
+    [JsonIgnore]
     public virtual Contract? IdContractNavigation { get; set; }
 }
