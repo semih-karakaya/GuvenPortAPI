@@ -13,24 +13,11 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json; // Keep if you use JsonConvert
 
-// You might need a specific interface for this service (e.g., IOfficeService)
-// namespace demo.webapi.Models.Interface
-// {
-//     public interface IOfficeService
-//     {
-//         Task<Office> AddOfficeService(Office office);
-//         Task<List<vmOfficeDetails>> ListOfficeService(); // You'll need a VM for listing offices
-//         Task<vmOfficeDetails> GetOneOfficeFromID(int id); // You'll need a VM for getting details
-//         Task<Office> EditOfficeService(Office office);
-//         Task<bool> DeleteOfficeService(int id);
-//         // Add methods for managing related entities like StaffOffice and Workplaces if needed
-//     }
-// }
 
 
 namespace GuvenPortAPI.Service
 {
-    // You'll need to implement an interface like IOfficeService
+   
     public class WorkplaceService : IWorkplaceService
     {
         private readonly isgportalContext _db;

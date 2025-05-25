@@ -59,6 +59,7 @@ namespace GuvenPortAPI.Controllers
 
             // Rolü Claim olarak ekle (ClaimTypes.Role, ASP.NET Core'un beklediği standart ROLLER için kullanılan Claim Type'dır)
             claims.Add(new Claim(ClaimTypes.Role, isDoctor ? "Doctor" : "Staff"));
+            claims.Add(new Claim("is_doctor", isDoctor.ToString().ToLower()));
 
             // JWT Key ve Expiration alma
             var utcNow = DateTime.UtcNow; // UTC kullanmak iyi bir pratiktir

@@ -40,26 +40,32 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
-        //ClockSkew = TimeSpan.Zero
-    };
-});
+builder.Services
+  .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+  .AddJwtBearer(opt =>
+  {
+      opt.TokenValidationParameters = new TokenValidationParameters
+      {
+          ValidateIssuer = true,
+          ValidateAudience = true,
+          ValidateLifetime = true,
+          ValidIssuer = builder.Configuration["Jwt:Issuer"],
+          ValidAudience = builder.Configuration["Jwt:Audience"],
+          IssuerSigningKey = new SymmetricSecurityKey(
+                                      Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+          //ClockSkew = TimeSpan.Zero
+      };
+      // Eğer token'ı cookie içinde koyduysanız bu kısmı ekleyin
+      opt.Events = new JwtBearerEvents
+      {
+          OnMessageReceived = ctx =>
+          {
+              if (ctx.Request.Cookies.ContainsKey("authToken"))
+                  ctx.Token = ctx.Request.Cookies["authToken"];
+              return Task.CompletedTask;
+          }
+      };
+  });
 
 // Yetkilendirme Servislerini Ekleme (bu kısım kalacak, [Authorize] attribute'ları için)
 builder.Services.AddAuthorization(options =>
@@ -72,40 +78,30 @@ builder.Services.AddAuthorization(options =>
 
 
 
-builder.Services.AddDbContext<isgportalContext>((serviceProvider, options) =>
+builder.Services.AddDbContext<isgportalContext>((sp, options) =>
 {
-    var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-    var httpContextAccessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
+    var cfg = sp.GetRequiredService<IConfiguration>();
+    var httpCtx = sp.GetRequiredService<IHttpContextAccessor>().HttpContext;
+    var user = httpCtx?.User;
 
-    string connectionString;
+    // Burada illa kullanıcı authenticate edilmişse is_doctor claim’ine bakalım
+    var isDoctor = user?
+      .Claims
+      .Any(c => c.Type == "is_doctor" && c.Value == "true")
+      ?? false;
 
-    var user = httpContextAccessor.HttpContext?.User;
+    var csName = isDoctor
+      ? "DoctorFullAccessConnection"
+      : "StaffReadOnlyConnection";
 
-    // Kullanıcı kimliği doğrulanmış mı kontrol et
-    if (user != null && user.Identity != null && user.Identity.IsAuthenticated)
-    {
-        // ÖZEL CLAIM OLUŞTURUYORUZ: 'is_doctor' adında bir Claim arayacağız
-        // ClaimTypes.Role yerine kendi özel claim'imizi arayacağız.
-        var isDoctorClaim = user.Claims.FirstOrDefault(c => c.Type == "is_doctor");
+    // Debug için konsola yazdırıyoruz
+    Console.WriteLine($"[DbContext] is_doctor = {isDoctor}. Using connection='{csName}'");
 
-        if (isDoctorClaim != null && isDoctorClaim.Value.ToLower() == "true")
-        {
-            connectionString = configuration.GetConnectionString("DoctorFullAccessConnection");
-        }
-        else // is_doctor claim'i yoksa, false ise, veya diğer durumlarda Staff Connection String'i kullanılsın
-        {
-            connectionString = configuration.GetConnectionString("StaffReadOnlyConnection");
-        }
-    }
-    else
-    {
-        // Anonim kullanıcılar için (örneğin AuthController'daki login metodu için)
-        // StaffReadOnlyConnection'ı kullanalım. Neden IdentityConnection'a ihtiyaç duymuyoruz?
-        // Çünkü artık Identity tabloları yok, sadece kendi staff tablolarımız var.
-        connectionString = configuration.GetConnectionString("StaffReadOnlyConnection");
-    }
+    var connStr = cfg.GetConnectionString(csName);
+    options.UseNpgsql(connStr);
 
-    options.UseNpgsql(connectionString);
+    // Eğer dilerseniz SQL ve Connection logunu bu şekilde açabilirsiniz:
+    // options.LogTo(Console.WriteLine, Microsoft.Extensions.Logging.LogLevel.Information);
 });
 
 builder.Services.AddSwaggerGen(options =>
@@ -149,10 +145,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(Theme.UniversalDark);
 }
-
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+
 
 app.MapControllers();
 

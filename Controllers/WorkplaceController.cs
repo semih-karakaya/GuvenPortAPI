@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using GuvenPortAPI.Service;
 
 
 namespace GuvenPortAPI.Controllers
@@ -69,6 +70,17 @@ namespace GuvenPortAPI.Controllers
             return Ok(result);
         }
 
-        // Diğer metotlar buraya eklenebilir...
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<bool>> DeleteWorkplace(int id)
+        {
+            var result = await _workplaceService.DeleteWorkplaceService(id);
+
+            if (!result)
+            {
+                return NotFound();
+            }
+
+            return Ok(result);
+        }
     }
 }

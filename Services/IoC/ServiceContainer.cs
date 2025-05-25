@@ -16,6 +16,7 @@ namespace GuvenPortAPI.Services.IoC
             services.AddScoped<IContractService, ContractService>();
             services.AddScoped<IEmployeeService, EmployeeService>();
             services.AddScoped<IMedicalExaminationService, MedicalExaminationService>();
+            services.AddScoped<IStaffExaminationSummaryService, StaffExaminationSummaryService>();
             // Add other services as needed
         }
     }

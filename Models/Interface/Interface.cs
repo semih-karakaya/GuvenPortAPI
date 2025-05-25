@@ -99,7 +99,13 @@ namespace GuvenPortAPI.Models.Interface
         Task<MedicalExaminationDto> GetMedicalExaminationByIdAsync(int id);
         Task<MedicalExaminationDto> UpdateMedicalExaminationAsync(MedicalExaminationDto examination);
         Task<bool> DeleteMedicalExaminationAsync(int id);
+
     }
+    public interface IStaffExaminationSummaryService
+    {
+       Task<List<StaffExaminationSummary>> GetAllAsync();
+    }
+   
 
 }
 

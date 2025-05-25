@@ -60,14 +60,14 @@ namespace GuvenPortAPI.Controllers
             return Ok(result);
         }
 
-        [HttpDelete("delete/{id}")]
-        public async Task<ActionResult<bool>> DeleteContract(int id)
-        {
-            var result = await _contractService.DeleteContractAsync(id);
-            if (!result) return NotFound($"Contract with ID {id} not found.");
+        //[HttpDelete("delete/{id}")]
+        //public async Task<ActionResult<bool>> DeleteContract(int id)
+        //{
+        //    var result = await _contractService.DeleteContractAsync(id);
+        //    if (!result) return NotFound($"Contract with ID {id} not found.");
 
-            return Ok(result);
-        }
+        //    return Ok(result);
+        //}
 
         [HttpGet("byworkplace/{workplaceId}/employees")]
         public async Task<IActionResult> GetEmployeesByWorkplaceId(int workplaceId)
