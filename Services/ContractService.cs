@@ -63,8 +63,25 @@ namespace GuvenPortAPI.Service
                         Id = c.IdEmployeeNavigation.Id,
                         Name = c.IdEmployeeNavigation.Name
                     }
-                 } // Eğer ilişki varsa, çalışan bilgilerinin alınması
+                 } 
              }).ToListAsync();
+        }
+        public async Task<List<ContractWithEmployeesDto>> getnameswithcontractid(int contractid)
+        {
+            return await _context.Contract
+                .Where(c => c.Id == contractid)
+                .Select(c => new ContractWithEmployeesDto
+                {
+                    Id = c.Id,
+                    Employees = c.IdEmployeeNavigation == null ? new List<EmployeeDto2>() : new List<EmployeeDto2>
+                    {
+                        new EmployeeDto2
+                        {
+                            Id = c.IdEmployeeNavigation.Id,
+                            Name = c.IdEmployeeNavigation.Name ?? string.Empty
+                        }
+                    }
+                }).ToListAsync();
         }
     }
 

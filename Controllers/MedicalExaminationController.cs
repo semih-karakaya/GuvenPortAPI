@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GuvenPortAPI.Models;
 using GuvenPortAPI.Models.Interface;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace GuvenPortAPI.Controllers
 {
     [Route("api/medicalexamination")]
     [ApiController]
+    [Authorize]
     public class MedicalExaminationController : ControllerBase
     {
         private readonly IMedicalExaminationService _medicalExaminationService;
@@ -28,6 +31,7 @@ namespace GuvenPortAPI.Controllers
         [HttpGet("ListMedicalExaminations")]
         public async Task<ActionResult<List<MedicalExaminationDto>>> ListMedicalExaminations()
         {
+            
             var result = await _medicalExaminationService.GetAllMedicalExaminationsAsync();
             if (result == null || result.Count == 0) return NotFound("No medical examinations found.");
             return Ok(result);

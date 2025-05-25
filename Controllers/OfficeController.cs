@@ -9,6 +9,7 @@ namespace GuvenPortAPI.Controllers
 {
     [Route("api/office")]
     [ApiController]
+    [Authorize]
     public class OfficeController : ControllerBase
     {
         private readonly IOfficeService _officeService;

@@ -29,9 +29,9 @@ public partial class Accident
     public DateOnly? SgkInfoDate { get; set; }
 
     public bool? SgkInfoCheck { get; set; }
-   
+
     public virtual ICollection<AccidentReportStaff> AccidentReportStaff { get; set; } = new List<AccidentReportStaff>();
-  
+
     public virtual ICollection<ContractAccident> ContractAccident { get; set; } = new List<ContractAccident>();
     [JsonIgnore]
     public virtual Workplace? IdWorkplaceNavigation { get; set; }

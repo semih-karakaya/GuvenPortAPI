@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GuvenPortAPI.Models;
 using GuvenPortAPI.Models.Interface;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace GuvenPortAPI.Controllers
 {
     [Route("api/staff")]
     [ApiController]
+    [Authorize]
     public class StaffController : ControllerBase
     {
         private readonly IStaffService _staffService;

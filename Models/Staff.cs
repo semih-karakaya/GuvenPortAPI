@@ -23,6 +23,7 @@ public partial class Staff
     public bool? Active { get; set; }
     [JsonIgnore]
     public virtual ICollection<AccidentReportStaff> AccidentReportStaff { get; set; } = new List<AccidentReportStaff>();
+
     public virtual Doctor? Doctor { get; set; }
     [JsonIgnore]
     public virtual ICollection<Office> Office { get; set; } = new List<Office>();

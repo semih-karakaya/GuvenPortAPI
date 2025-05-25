@@ -74,6 +74,7 @@ namespace GuvenPortAPI.Models.Interface
         Task<Contract> UpdateContractAsync(Contract contract);
         Task<bool> DeleteContractAsync(int id);
         Task<List<ContractWithEmployeesDto>> GetActiveContractsWithEmployeesByWorkplaceIdAsync(int workplaceId);
+        Task<List<ContractWithEmployeesDto>> getnameswithcontractid(int contractid);
     }
     public interface IEmployeeService
     {

@@ -4,11 +4,13 @@ using System.Threading.Tasks;
 using GuvenPortAPI.Models;
 using GuvenPortAPI.Models.DTOs;
 using GuvenPortAPI.Models.Interface;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GuvenPortAPI.Controllers
 {
     [Route("api/employees")]
     [ApiController]
+    [Authorize]
     public class EmployeeController : ControllerBase
     {
         private readonly IEmployeeService _employeeService;

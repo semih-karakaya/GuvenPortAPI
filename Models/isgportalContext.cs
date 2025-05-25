@@ -37,6 +37,8 @@ public partial class isgportalContext : DbContext
 
     public virtual DbSet<Staff> Staff { get; set; }
 
+    public virtual DbSet<StaffExaminationSummary> StaffExaminationSummary { get; set; }
+
     public virtual DbSet<StaffOffice> StaffOffice { get; set; }
 
     public virtual DbSet<StaffWorkplace> StaffWorkplace { get; set; }
@@ -45,12 +47,10 @@ public partial class isgportalContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseNpgsql("Host=localhost;Database=isgportal;Username=postgres;Password=159951;Persist Security Info=True");
+        => optionsBuilder.UseNpgsql("Host=localhost;Database=isgportal;Username=postgres;Password=159951");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.HasPostgresEnum("exam_type", new[] { "İşe Giriş", "Periyodik", "Kaza Sonrası", "IseGiris", "KazaSonrasi" });
-
         modelBuilder.Entity<Accident>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("accident_pkey");
@@ -268,6 +268,23 @@ public partial class isgportalContext : DbContext
             entity.Property(e => e.Ssn)
                 .HasMaxLength(20)
                 .HasColumnName("ssn");
+        });
+
+        modelBuilder.Entity<StaffExaminationSummary>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToView("staff_examination_summary");
+
+            entity.Property(e => e.DoctorName)
+                .HasMaxLength(255)
+                .HasColumnName("doctor_name");
+            entity.Property(e => e.EmployeeName)
+                .HasMaxLength(255)
+                .HasColumnName("employee_name");
+            entity.Property(e => e.ExaminationDate).HasColumnName("examination_date");
+            entity.Property(e => e.ExaminationId).HasColumnName("examination_id");
+            entity.Property(e => e.ExaminationType).HasColumnName("examination_type");
         });
 
         modelBuilder.Entity<StaffOffice>(entity =>

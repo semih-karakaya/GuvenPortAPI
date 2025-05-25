@@ -3,11 +3,14 @@ using GuvenPortAPI.Models.Interface;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace GuvenPortAPI.Controllers
 {
     [Route("api/workplace")]
     [ApiController]
+    [Authorize]
     public class WorkplaceController : ControllerBase
     {
         private readonly IWorkplaceService _workplaceService;

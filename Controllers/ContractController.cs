@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GuvenPortAPI.Models;
 using GuvenPortAPI.Models.Interface;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GuvenPortAPI.Controllers
 {
     [Route("api/contracts")]
     [ApiController]
+    [Authorize]
     public class ContractController : ControllerBase
     {
         private readonly IContractService _contractService;
@@ -71,6 +73,18 @@ namespace GuvenPortAPI.Controllers
         public async Task<IActionResult> GetEmployeesByWorkplaceId(int workplaceId)
         {
             var contractsWithEmployees = await _contractService.GetActiveContractsWithEmployeesByWorkplaceIdAsync(workplaceId);
+
+            if (!contractsWithEmployees.Any())
+            {
+                return NotFound(); // Eğer aktif kontratlar yoksa 404 döndür
+            }
+
+            return Ok(contractsWithEmployees); // Aktif kontratlar ve çalışanları döner
+        }
+        [HttpGet("getnames/{cid}")]
+        public async Task<IActionResult> getnames(int cid)
+        {
+            var contractsWithEmployees = await _contractService.getnameswithcontractid(cid);
 
             if (!contractsWithEmployees.Any())
             {
