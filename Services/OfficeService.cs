@@ -11,26 +11,13 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json; // Keep if you use JsonConvert
+using Newtonsoft.Json; 
 
-// You might need a specific interface for this service (e.g., IOfficeService)
-// namespace demo.webapi.Models.Interface
-// {
-//     public interface IOfficeService
-//     {
-//         Task<Office> AddOfficeService(Office office);
-//         Task<List<vmOfficeDetails>> ListOfficeService(); // You'll need a VM for listing offices
-//         Task<vmOfficeDetails> GetOneOfficeFromID(int id); // You'll need a VM for getting details
-//         Task<Office> EditOfficeService(Office office);
-//         Task<bool> DeleteOfficeService(int id);
-//         // Add methods for managing related entities like StaffOffice and Workplaces if needed
-//     }
-// }
 
 
 namespace GuvenPortAPI.Service
 {
-    // You'll need to implement an interface like IOfficeService
+  
     public class OfficeService : IOfficeService
     {
         private readonly isgportalContext _db;
@@ -50,18 +37,18 @@ namespace GuvenPortAPI.Service
             }
             else
             {
-                return new Office(); // Avoid returning null
+                return new Office(); 
             }
         }
         public async Task<int> GetTotalActiveCompaniesAsync()
         {
-            using var context = new isgportalContext(); // Replace with your actual DbContext
+            using var context = new isgportalContext(); 
             return await context.Office.CountAsync(o => o.Active == true);
         }
 
         public async Task<List<Workplace>> GetActiveWorkplacesByOfficeIdAsync(int officeId)
         {
-            using var context = new isgportalContext(); // Replace with your actual DbContext
+            using var context = new isgportalContext(); 
             return await context.Workplace
                 .Where(w => w.IdOffice == officeId && w.Active == true)
                 .ToListAsync();
@@ -69,13 +56,13 @@ namespace GuvenPortAPI.Service
             
         public async Task<int> GetTotalActiveWorkplacesAsync()
         {
-            using var context = new isgportalContext(); // Replace with your actual DbContext
+            using var context = new isgportalContext(); 
             return await context.Workplace.CountAsync(w => w.Active == true);
         }
 
         public async Task<List<CompanyWorkplaceCountDto>> GetCompanyWorkplaceCountsAsync()
         {
-            using var context = new isgportalContext(); // Replace with your actual DbContext
+            using var context = new isgportalContext(); 
             var result = await (from o in context.Office
                                 where o.Active == true
                                 join w in context.Workplace.Where(x => x.Active == true)
@@ -154,7 +141,7 @@ namespace GuvenPortAPI.Service
                 return new vmOfficeDetails();
             }
 
-            // Staff tablosundan Manager Name'i çekiyoruz
+            
             var manager = await _db.Staff
                 .FirstOrDefaultAsync(s => s.Id == office.IdManagerstaff);
 
@@ -164,7 +151,7 @@ namespace GuvenPortAPI.Service
                 OfficeName = office.OName ?? string.Empty,
                 Address = office.Address ?? string.Empty,
                 Crm = office.Crm ?? string.Empty,
-                ManagerName = manager?.Name ?? string.Empty, // Manager Name burada atanıyor
+                ManagerName = manager?.Name ?? string.Empty, 
             };
 
             return officeDetails;
@@ -177,7 +164,7 @@ namespace GuvenPortAPI.Service
                 var existingOffice = await _db.Office.FirstOrDefaultAsync(o => o.Id == office.Id);
                 if (existingOffice == null)
                 {
-                    return new Office(); // Avoid returning null
+                    return new Office(); 
                 }
 
                 existingOffice.Address = office.Address ?? existingOffice.Address;
@@ -191,13 +178,13 @@ namespace GuvenPortAPI.Service
             }
             else
             {
-                return new Office(); // Avoid returning null
+                return new Office(); 
             }
         }
 
         public async Task<List<vmOfficeDetails>> GetActiveOfficesWithManagerAsync()
         {
-            using var context = new isgportalContext(); // Use your actual DbContext
+            using var context = new isgportalContext(); 
             var result = await (from o in context.Office
                                 where o.Active == true
                                 join s in context.Staff on o.IdManagerstaff equals s.Id into mgr

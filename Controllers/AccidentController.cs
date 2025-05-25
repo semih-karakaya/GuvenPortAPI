@@ -42,10 +42,10 @@ namespace GuvenPortAPI.Controllers
                 SgkInfoCheck = model.SgkInfoCheck ?? false // Nullable bool, varsayılan false
             };
 
-            // Kazayı veritabanına ekle
+           
             var createdAccident = await _accidentService.AddAccidentAsync(accident);
 
-            // Seçilen staff ve contract'ları ekle
+           
             foreach (var staffId in model.SelectedStaffIds)
             {
                 await _accidentService.AddStaffToAccidentAsync(createdAccident.Id, staffId);

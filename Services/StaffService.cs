@@ -17,7 +17,7 @@ namespace GuvenPortAPI.Service
 
         public async Task<Staff> AddStaffAsync(Staff staff)
         {
-            _context.Staff.Add(staff); // Fixed: Staffs -> Staff
+            _context.Staff.Add(staff); 
             await _context.SaveChangesAsync();
             return staff;
         }
@@ -32,12 +32,12 @@ namespace GuvenPortAPI.Service
 
         public async Task<Staff> GetStaffByIdAsync(int id)
         {
-            return await _context.Staff.FindAsync(id); // Fixed: Staffs -> Staff
+            return await _context.Staff.FindAsync(id); 
         }
 
         public async Task<Staff> UpdateStaffAsync(Staff staff)
         {
-            _context.Staff.Update(staff); // Fixed: Staffs -> Staff
+            _context.Staff.Update(staff); 
             await _context.SaveChangesAsync();
             return staff;
         }

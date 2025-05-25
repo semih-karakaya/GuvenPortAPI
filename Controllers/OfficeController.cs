@@ -65,7 +65,7 @@ namespace GuvenPortAPI.Controllers
             return Ok(new { total_active_workplaces = total });
         }
 
-        // Tüm ofisleri listele
+        
         [HttpGet("all")]
         public async Task<ActionResult<List<vmOfficeDetails>>> ListOffices()
         {

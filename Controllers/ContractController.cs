@@ -76,10 +76,10 @@ namespace GuvenPortAPI.Controllers
 
             if (!contractsWithEmployees.Any())
             {
-                return NotFound(); // Eğer aktif kontratlar yoksa 404 döndür
+                return NotFound(); 
             }
 
-            return Ok(contractsWithEmployees); // Aktif kontratlar ve çalışanları döner
+            return Ok(contractsWithEmployees); 
         }
         [HttpGet("getnames/{cid}")]
         public async Task<IActionResult> getnames(int cid)
@@ -88,10 +88,10 @@ namespace GuvenPortAPI.Controllers
 
             if (!contractsWithEmployees.Any())
             {
-                return NotFound(); // Eğer aktif kontratlar yoksa 404 döndür
+                return NotFound(); 
             }
 
-            return Ok(contractsWithEmployees); // Aktif kontratlar ve çalışanları döner
+            return Ok(contractsWithEmployees); 
         }
     }
 }

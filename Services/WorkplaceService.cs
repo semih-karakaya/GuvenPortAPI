@@ -15,9 +15,10 @@ using Newtonsoft.Json; // Keep if you use JsonConvert
 
 
 
+
 namespace GuvenPortAPI.Service
 {
-   
+  
     public class WorkplaceService : IWorkplaceService
     {
         private readonly isgportalContext _db;
@@ -37,7 +38,7 @@ namespace GuvenPortAPI.Service
             }
             else
             {
-                return new Workplace(); // Avoid returning null
+                return new Workplace(); 
             }
         }
         public async Task<string?> GetWorkplaceNameByIdAsync(int workplaceId)
@@ -99,7 +100,7 @@ namespace GuvenPortAPI.Service
                                     IdDoctor = m.IdDoctor,
                                     ExaminationType = m.ExaminationType,
                                     ValidityDate = m.ValidityDate
-                                    // Map other properties as needed
+                                    
                                 }).ToListAsync();
 
             return result;
@@ -245,7 +246,7 @@ namespace GuvenPortAPI.Service
                                       .Include(w => w.IdOfficeNavigation)
                                       .FirstOrDefaultAsync(w => w.Id == id);
 
-            return workplace ?? new Workplace(); // Avoid returning null
+            return workplace ?? new Workplace(); 
         }
 
         public async Task<Workplace> EditWorkplaceService(Workplace workplace)
@@ -255,7 +256,7 @@ namespace GuvenPortAPI.Service
                 var existingWorkplace = await _db.Workplace.FirstOrDefaultAsync(w => w.Id == workplace.Id);
                 if (existingWorkplace == null)
                 {
-                    return new Workplace(); // Avoid returning null
+                    return new Workplace(); 
                 }
 
                 existingWorkplace.Name = workplace.Name ?? existingWorkplace.Name;
@@ -268,7 +269,7 @@ namespace GuvenPortAPI.Service
             }
             else
             {
-                return new Workplace(); // Avoid returning null
+                return new Workplace(); 
             }
         }
 
@@ -328,7 +329,7 @@ namespace GuvenPortAPI.Service
                                      .Include(w => w.IdOfficeNavigation)
                                      .FirstOrDefaultAsync(w => w.IdOffice == officeId);
 
-            return workplace ?? new Workplace(); // Avoid returning null
+            return workplace ?? new Workplace(); 
         }
     }
 

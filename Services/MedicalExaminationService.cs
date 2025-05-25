@@ -98,7 +98,7 @@ namespace GuvenPortAPI.Service
             if (entity == null) return null;
             entity.IdContract = examination.IdContract;
             entity.IdDoctor = examination.IdDoctor;
-            // Update other properties if needed
+            
             _context.MedicalExamination.Update(entity);
             await _context.SaveChangesAsync();
             return MapToDto(entity);
